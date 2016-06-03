@@ -1,8 +1,8 @@
-## APIVersion: 100014
-## Title: Slightly Improved™ Attribute Bars
-## SavedVariables: SlightlyImprovedAttributeBars_SavedVars
+## APIVersion: 100015
 ## Version: 2.0.0
+## Title: Slightly Improved™ Attribute Bars
 ## License: CC BY-NC-SA 4.0
+## SavedVariables: SlightlyImprovedAttributeBars_SavedVars
 
 LibStub/LibStub.lua
 
@@ -20,8 +20,6 @@ LibAddonMenu-2.0/controls/header.lua
 LibAddonMenu-2.0/controls/slider.lua
 LibAddonMenu-2.0/controls/texture.lua
 LibAddonMenu-2.0/controls/iconpicker.lua
-
-LibCustomSettings-1.0/LibCustomSettings.lua
 
 Settings.lua
 

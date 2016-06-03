@@ -1,12 +1,6 @@
-<!--
--- SlightlyImprovedAttributeBars 2.0.0
--- Licensed under CC BY-NC-SA 4.0
--->
-
+<!-- SlightlyImprovedAttributeBars 2.0.0
+  -- Licensed under CC BY-NC-SA 4.0
+  -->
 <GuiXml>
-    <Font name="Siab_LabelFont" font="$(BOLD_FONT)|18|soft-shadow-thick"/>
-
-    <Controls>
-        <Label name="Siab_Label" font="Siab_LabelFont" layer="3" tier="2" level="1" virtual="true" />
-    </Controls>
+    <Font name="SiabFont" font="$(BOLD_FONT)|18|soft-shadow-thick"/>
 </GuiXml>
