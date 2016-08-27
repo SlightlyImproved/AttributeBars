@@ -1,4 +1,4 @@
-## APIVersion: 100015
+## APIVersion: 100016
 ## Version: 2.0.0
 ## Title: Slightly Improved™ Attribute Bars
 ## License: CC BY-NC-SA 4.0
