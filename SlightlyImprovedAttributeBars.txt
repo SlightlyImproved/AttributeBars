@@ -1,4 +1,4 @@
-## APIVersion: 100016
+## APIVersion: 100018
 ## Version: 2.0.1
 ## Title: Slightly Improved™ Attribute Bars
 ## License: MIT
