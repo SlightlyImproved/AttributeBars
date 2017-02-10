@@ -1,5 +1,5 @@
--- Slightly Improved™ Attribute Bars 2.0.1 (Aug 27 2016)
--- Licensed under MIT © 2016 Arthur Corenzan
+-- Slightly Improved™ Attribute Bars 2.1.0 (Feb 10 2017)
+-- Licensed under MIT © 2017 Arthur Corenzan
 
 -- Uncomment to disable debug messages
 local function d() end
