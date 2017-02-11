@@ -11,6 +11,9 @@ local NAMESPACE = "SlightlyImprovedAttributeBars"
 --
 --
 
+-- Override default format
+SafeAddString(SI_ATTRIBUTE_NUMBERS_WITH_PERCENT, "<<1>> (<<2>>%)")
+
 -- Override esoui/ingame/globals/globals.lua:119
 function ZO_FormatResourceBarCurrentAndMax(current, maximum)
     local returnValue = ""
@@ -99,8 +102,8 @@ local function OnAddOnLoaded(event, addOnName)
                 if (key == "forceAlwaysShow") then
                     PLAYER_ATTRIBUTE_BARS:ForceShow(value)
                     for _, i in ipairs({1, 3, 5}) do
-                        local attributeBar = PLAYER_ATTRIBUTE_BARS.bars[i]
-                        attributeBar:UpdateStatusBar()
+                        local bar = PLAYER_ATTRIBUTE_BARS.bars[i]
+                        bar:UpdateStatusBar()
                     end
                 end
                 if (key == "targetFramePosition") then
@@ -114,6 +117,16 @@ local function OnAddOnLoaded(event, addOnName)
             ImproveTargetUnitFrame(savedVars.targetFramePosition)
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
+
+        local function OnInterfaceSettingsChanged()
+            if savedVars.forceAlwaysShow then
+                for _, i in ipairs({1, 3, 5}) do
+                    local bar = PLAYER_ATTRIBUTE_BARS.bars[i]
+                    bar:UpdateResourceNumbersLabel(bar.current, bar.effectiveMax)
+                end
+            end
+        end
+        EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_INTERFACE_SETTING_CHANGED, OnInterfaceSettingsChanged)
 
         CALLBACK_MANAGER:FireCallbacks(NAMESPACE.."_OnAddOnLoaded", savedVars)
     end
