@@ -1,6 +1,6 @@
 # Slightly Improved™ Attribute Bars
 
-> Tweaks the player's resource bars.
+> Add-on for Elder Scrolls Online to enhance the player's attribute bars.
 
 ## About
 
@@ -9,10 +9,6 @@
 - Option to force your Magicka, Health and Stamina bars to be shown at all times.
 - Toggle target's unit frame position between top and bottom of the screen.
 - Subtle visual enhancements and adjusments to the resource values.
-
-## Download
-
-You cand [get the last version](http://www.esoui.com/downloads/info72-SlightlyImprovedAttributeBars.html) for free on ESOUI.
 
 ## Legal
 
