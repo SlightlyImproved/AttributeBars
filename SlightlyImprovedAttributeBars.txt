@@ -1,5 +1,5 @@
-## APIVersion: 100018
 ## Version: 2.1.0
+## APIVersion: 100019
 ## Title: Slightly Improved™ Attribute Bars
 ## License: MIT
 ## SavedVariables: SlightlyImprovedAttributeBars_SavedVars
