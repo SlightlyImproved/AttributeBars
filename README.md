@@ -4,11 +4,12 @@
 
 ## About
 
-**Slightly Improved™ Attribute Bars** has received a major overhaul in version 2. Besides being now compatible with the latest version of the game, it leverages new features, like displaying resource text over the Magicka, Health and Stamina bars and improve upon them.
+**Slightly Improved™ Attribute Bars** has received a major overhaul in version 2. Besides being now compatible with the latest version of the game, it leverages new built-in features, like displaying resource values over the your attribute bars, and adds new options.
 
-- Option to force your Magicka, Health and Stamina bars to be shown at all times.
-- Toggle target's unit frame position between top and bottom of the screen.
-- Subtle visual enhancements and adjusments to the resource values.
+- Subtle visual enhancements to the Magicka, Health, and Stamina bars.
+- Switch target's Health bar position to the bottom of the screen, optionally only during combat.
+- Prevent the Health bar from fading while shield or damage absorption effect are active.
+- Displace Magicka, Health, and Stamina bars either further apart or closer together.
 
 ## Acknowledgement
 
@@ -16,7 +17,7 @@ Slightly Improved™ add-ons originally created by [Kevin](http://www.esoui.com/
 
 ## Legal
 
-- 2.x licensed under [MIT](MIT.md) © 2016 Arthur Corenzan.
-- 1.x licensed under [BSD](BSD.md) © 2014 Kevin Douglas.
+- 2.x licensed under [The MIT License](MIT.md) © 2016 Arthur Corenzan.
+- 1.x licensed under [The 2-Clause BSD License](BSD.md) © 2014 Kevin Douglas.
 
 This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. All rights reserved. See [Add-on Terms of Use](https://account.elderscrollsonline.com/add-on-terms).
