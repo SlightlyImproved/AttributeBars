@@ -32,6 +32,13 @@ local options =
         setFunc = function(value) settings.switchTargetFramePositionInCombat = value end,
     },
     {
+        type = "checkbox",
+        name = "Prevent Shielded Health From Fading",
+        tooltip = "Prevent the Health bar from fading while shield or damage absorption effect are active.",
+        getFunc = function() return settings.keepShieldedHealthShowing end,
+        setFunc = function(value) settings.keepShieldedHealthShowing = value end,
+    },
+    {
         type = "slider",
         name = "Attribute Bars Horizontal Shift",
         tooltip = "Displace Magicka, Health, and Stamina bars either further apart or closer together.",

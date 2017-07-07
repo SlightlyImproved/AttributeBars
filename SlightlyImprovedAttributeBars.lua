@@ -6,6 +6,7 @@ local function d() end
 local function df() end
 
 local NAMESPACE = "SlightlyImprovedAttributeBars"
+local savedVars = {}
 
 --
 --
@@ -96,6 +97,42 @@ local function ImproveTargetUnitFrame(position)
     anchor:Set(PLAYER_TO_PLAYER.container)
 end
 
+local function PreventShieldedHealthBarFade()
+    local healthBar = PLAYER_ATTRIBUTE_BARS.bars[1]
+
+    local onPowerShieldUnitAttributeVisualAdded = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualAdded
+    function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualAdded(...)
+        onPowerShieldUnitAttributeVisualAdded(self, ...)
+        if (savedVars.keepShieldedHealthShowing) then
+            healthBar:AddForcedVisibleReference()
+        end
+    end
+
+    local onPowerShieldUnitAttributeVisualRemoved = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualRemoved
+    function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualRemoved(...)
+        onPowerShieldUnitAttributeVisualRemoved(self, ...)
+        if (savedVars.keepShieldedHealthShowing) then
+            healthBar:RemoveForcedVisibleReference()
+        end
+    end
+
+    local onArmorDamageUnitAttributeVisualAdded = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualAdded
+    function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualAdded(...)
+        onArmorDamageUnitAttributeVisualAdded(self, ...)
+        if (savedVars.keepShieldedHealthShowing) then
+            healthBar:AddForcedVisibleReference()
+        end
+    end
+
+    local onArmorDamageUnitAttributeVisualRemoved = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualRemoved
+    function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualRemoved(...)
+        onArmorDamageUnitAttributeVisualRemoved(self, ...)
+        if (savedVars.keepShieldedHealthShowing) then
+            healthBar:RemoveForcedVisibleReference()
+        end
+    end
+end
+
 --
 --
 --
@@ -105,11 +142,12 @@ local defaultSavedVars =
     targetFramePosition = "Top",
     attributeBarsOffsetXShift = 0,
     switchTargetFramePositionInCombat = false,
+    keepShieldedHealthShowing = true,
 }
 
 local function OnAddOnLoaded(event, addOnName)
     if (addOnName == NAMESPACE) then
-        local savedVars = ZO_SavedVars:New(NAMESPACE.."_SavedVars", 1, nil, defaultSavedVars)
+        savedVars = ZO_SavedVars:New(NAMESPACE.."_SavedVars", 1, nil, defaultSavedVars)
 
         do
             local mt = getmetatable(savedVars)
@@ -129,6 +167,7 @@ local function OnAddOnLoaded(event, addOnName)
             ImprovePlayerAttributeBars()
             ImproveTargetUnitFrame(savedVars.targetFramePosition)
             ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
+            PreventShieldedHealthBarFade()
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
@@ -142,7 +181,6 @@ local function OnAddOnLoaded(event, addOnName)
             end
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_COMBAT_STATE, OnPlayerCombatState)
-
 
         CALLBACK_MANAGER:FireCallbacks(NAMESPACE.."_OnAddOnLoaded", savedVars)
     end
