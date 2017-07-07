@@ -30,14 +30,17 @@ local options =
         choices = {"Top", "Bottom"},
         getFunc = function() return settings.targetFramePosition end,
         setFunc = function(value) settings.targetFramePosition = value end,
-    }
-    -- {
-    --     type = "checkbox",
-    --     name = "Show bar percentage",
-    --     tooltip = "Display the percentage value on top of attribute bars and target's health.",
-    --     getFunc = function() return addOnSettings:Get("showBarText") end,
-    --     setFunc = function(value) addOnSettings:Set("showBarText", value) end,
-    -- },
+    },
+    {
+        type = "slider",
+        name = "Attribute Bars Horizontal Shift",
+        tooltip = "Displace Magicka, Health, and Stamina bars either further apart or closer together.",
+        min = -80,
+        max = 280,
+        step = 10,
+        getFunc = function() return settings.attributeBarsOffsetXShift end,
+        setFunc = function(value) settings.attributeBarsOffsetXShift = value end,
+    },
 }
 
 CALLBACK_MANAGER:RegisterCallback(NAMESPACE.."_OnAddOnLoaded", function(savedVars)

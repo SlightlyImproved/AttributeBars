@@ -53,6 +53,22 @@ local function ImprovePlayerAttributeBars()
     end
 end
 
+
+local DEFAULT_MAGICKA_BAR_OFFSET_X =  237
+local DEFAULT_STAMINA_BAR_OFFSET_X = -237
+
+local function ApplyAttributeBarsOffsetXShift(shift)
+    local anchor = ZO_Anchor:New()
+
+    anchor:SetFromControlAnchor(ZO_PlayerAttributeMagicka, 0)
+    anchor:SetOffsets(DEFAULT_MAGICKA_BAR_OFFSET_X - shift)
+    anchor:Set(ZO_PlayerAttributeMagicka)
+
+    anchor:SetFromControlAnchor(ZO_PlayerAttributeStamina, 0)
+    anchor:SetOffsets(DEFAULT_STAMINA_BAR_OFFSET_X + shift)
+    anchor:Set(ZO_PlayerAttributeStamina)
+end
+
 local TARGET_UNIT_FRAME_OFFSET_OPTIONS =
 {
     ["Top"] = 88,
@@ -87,6 +103,7 @@ end
 local defaultSavedVars =
 {
     targetFramePosition = "Top",
+    attributeBarsOffsetXShift = 0,
     switchTargetFramePositionInCombat = false,
 }
 
@@ -102,12 +119,16 @@ local function OnAddOnLoaded(event, addOnName)
                 if (key == "targetFramePosition") then
                     ImproveTargetUnitFrame(savedVars.targetFramePosition)
                 end
+                if (key == "attributeBarsOffsetXShift") then
+                    ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
+                end
             end
         end
 
         local function OnPlayerActivated()
             ImprovePlayerAttributeBars()
             ImproveTargetUnitFrame(savedVars.targetFramePosition)
+            ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
