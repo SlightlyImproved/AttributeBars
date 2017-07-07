@@ -56,7 +56,7 @@ end
 local TARGET_UNIT_FRAME_OFFSET_OPTIONS =
 {
     ["Top"] = 88,
-    ["Bottom"] = 788,
+    ["Bottom"] = 742,
 }
 
 local PLAYER_TO_PLAYER_OFFSET_OPTIONS =
