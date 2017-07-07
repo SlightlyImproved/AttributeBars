@@ -17,19 +17,19 @@ local panel =
 local options =
 {
     {
-        type = "checkbox",
-        name = "Always show attribute bars",
-        tooltip = "Prevent the Stamina, Magicka and Health bars from fading off.",
-        getFunc = function() return settings.forceAlwaysShow end,
-        setFunc = function(value) settings.forceAlwaysShow = value end,
-    },
-    {
         type = "dropdown",
-        name = "Target unit frame position",
+        name = "Default Target's Frame Position",
         tooltip = "Displace your target's unit frame vertically. Top is the default position. Bottom is right above your Magicka, Health and Stamina bars.",
         choices = {"Top", "Bottom"},
         getFunc = function() return settings.targetFramePosition end,
         setFunc = function(value) settings.targetFramePosition = value end,
+    },
+    {
+        type = "checkbox",
+        name = "Switch Target's Frame Position in Combat",
+        tooltip = "Checking this will make target's frame switch position temporarily during combat.",
+        getFunc = function() return settings.switchTargetFramePositionInCombat end,
+        setFunc = function(value) settings.switchTargetFramePositionInCombat = value end,
     },
     {
         type = "slider",

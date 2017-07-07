@@ -132,6 +132,18 @@ local function OnAddOnLoaded(event, addOnName)
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
+        local function OnPlayerCombatState(eventCode, inCombat)
+            if savedVars.switchTargetFramePositionInCombat then
+                if (savedVars.targetFramePosition == "Top") then
+                    ImproveTargetUnitFrame(inCombat and "Bottom" or "Top")
+                else
+                    ImproveTargetUnitFrame(inCombat and "Top" or "Bottom")
+                end
+            end
+        end
+        EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_COMBAT_STATE, OnPlayerCombatState)
+
+
         CALLBACK_MANAGER:FireCallbacks(NAMESPACE.."_OnAddOnLoaded", savedVars)
     end
 end
