@@ -18,18 +18,11 @@ local options =
 {
     {
         type = "dropdown",
-        name = "Default Target's Frame Position",
-        tooltip = "Displace your target's unit frame vertically. Top is the default position. Bottom is right above your Magicka, Health and Stamina bars.",
-        choices = {"Top", "Bottom"},
-        getFunc = function() return settings.targetFramePosition end,
-        setFunc = function(value) settings.targetFramePosition = value end,
-    },
-    {
-        type = "checkbox",
-        name = "Switch Target's Frame Position in Combat",
-        tooltip = "Checking this will make target's frame switch position temporarily during combat.",
-        getFunc = function() return settings.switchTargetFramePositionInCombat end,
-        setFunc = function(value) settings.switchTargetFramePositionInCombat = value end,
+        name = "Switch Target's Frame Position",
+        tooltip = "Switch the target's Health bar position from the top to the bottom of screen. Automatic will only do the switch during combat.",
+        choices = {"Never", "Always", "Automatic"},
+        getFunc = function() return settings.switchTargetFramePosition end,
+        setFunc = function(value) settings.switchTargetFramePosition = value end,
     },
     {
         type = "checkbox",

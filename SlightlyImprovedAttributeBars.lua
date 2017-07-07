@@ -82,10 +82,13 @@ local PLAYER_TO_PLAYER_OFFSET_OPTIONS =
     ["Bottom"] = -385,
 }
 
-local function ImproveTargetUnitFrame(position)
+local function ImproveTargetUnitFrame()
     local unitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
     unitFrame.healthBar.resourceNumbersLabel:SetFont("SiabFont")
+end
 
+local function SwitchTargetFramePosition(position)
+    local unitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
     local anchor = ZO_Anchor:New()
 
     anchor:SetFromControlAnchor(unitFrame.frame, 0)
@@ -139,10 +142,9 @@ end
 
 local defaultSavedVars =
 {
-    targetFramePosition = "Top",
-    attributeBarsOffsetXShift = 0,
-    switchTargetFramePositionInCombat = false,
+    switchTargetFramePosition = "Never",
     keepShieldedHealthShowing = true,
+    attributeBarsOffsetXShift = 0,
 }
 
 local function OnAddOnLoaded(event, addOnName)
@@ -155,7 +157,11 @@ local function OnAddOnLoaded(event, addOnName)
             function mt.__newindex(self, key, value)
                 __newindex(self, key, value)
                 if (key == "targetFramePosition") then
-                    ImproveTargetUnitFrame(savedVars.targetFramePosition)
+                    if (value == "Always") or (value == "Automatic" and IsUnitInCombat("player")) then
+                        SwitchTargetFramePosition("Bottom")
+                    else
+                        SwitchTargetFramePosition("Top")
+                    end
                 end
                 if (key == "attributeBarsOffsetXShift") then
                     ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
@@ -165,19 +171,18 @@ local function OnAddOnLoaded(event, addOnName)
 
         local function OnPlayerActivated()
             ImprovePlayerAttributeBars()
-            ImproveTargetUnitFrame(savedVars.targetFramePosition)
+            ImproveTargetUnitFrame()
+            if (savedVars.switchTargetFramePosition == "Always") then
+                SwitchTargetFramePosition("Bottom")
+            end
             ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
             PreventShieldedHealthBarFade()
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
 
         local function OnPlayerCombatState(eventCode, inCombat)
-            if savedVars.switchTargetFramePositionInCombat then
-                if (savedVars.targetFramePosition == "Top") then
-                    ImproveTargetUnitFrame(inCombat and "Bottom" or "Top")
-                else
-                    ImproveTargetUnitFrame(inCombat and "Top" or "Bottom")
-                end
+            if (savedVars.switchTargetFramePosition == "Automatic") then
+                SwitchTargetFramePosition(inCombat and "Bottom" or "Top")
             end
         end
         EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_COMBAT_STATE, OnPlayerCombatState)
