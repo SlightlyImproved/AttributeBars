@@ -2,7 +2,7 @@
 -- The MIT License © 2017 Arthur Corenzan
 
 -- Uncomment to disable debug messages
-local function d() end
+local function d()  end
 local function df() end
 
 local NAMESPACE = "SlightlyImprovedAttributeBars"
@@ -54,19 +54,36 @@ local function ImprovePlayerAttributeBars()
     end
 end
 
+-- esoui/esoui/blob/master/esoui/ingame/playerattributebars/playerattributebars.lua:375
+local ATTRIBUTE_BAR_EXPANDED_WIDTH = 323
+local ATTRIBUTE_BAR_GUTTER = 30
 
-local DEFAULT_MAGICKA_BAR_OFFSET_X =  237
-local DEFAULT_STAMINA_BAR_OFFSET_X = -237
+local function GetAttributeBarMinOffsetX()
+    return ATTRIBUTE_BAR_GUTTER
+end
 
-local function ApplyAttributeBarsOffsetXShift(shift)
+local function GetAttributeBarMaxOffsetX()
+    return GuiRoot:GetWidth() / 2 - ATTRIBUTE_BAR_EXPANDED_WIDTH / 2 - ATTRIBUTE_BAR_EXPANDED_WIDTH - ATTRIBUTE_BAR_GUTTER
+end
+
+local function ApplyAttributeBarsOffsetXShift(value)
     local anchor = ZO_Anchor:New()
 
+    -- Convert from -100..+100 range to actual UI pixel range.
+    local offsetX = (value + 100) * (GetAttributeBarMaxOffsetX() - GetAttributeBarMinOffsetX()) / 200 + GetAttributeBarMinOffsetX()
+
     anchor:SetFromControlAnchor(ZO_PlayerAttributeMagicka, 0)
-    anchor:SetOffsets(DEFAULT_MAGICKA_BAR_OFFSET_X - shift)
+    anchor:SetOffsets(-offsetX)
+    anchor:SetRelativePoint(LEFT)
+    anchor:SetMyPoint(RIGHT)
+    anchor:SetTarget(ZO_PlayerAttributeHealth)
     anchor:Set(ZO_PlayerAttributeMagicka)
 
     anchor:SetFromControlAnchor(ZO_PlayerAttributeStamina, 0)
-    anchor:SetOffsets(DEFAULT_STAMINA_BAR_OFFSET_X + shift)
+    anchor:SetOffsets(offsetX)
+    anchor:SetRelativePoint(RIGHT)
+    anchor:SetMyPoint(LEFT)
+    anchor:SetTarget(ZO_PlayerAttributeHealth)
     anchor:Set(ZO_PlayerAttributeStamina)
 end
 
