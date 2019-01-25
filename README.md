@@ -17,7 +17,7 @@ Slightly Improved™ add-ons originally created by [Kevin](http://www.esoui.com/
 
 ## Legal
 
-- 2.x licensed under [The MIT License](MIT.md) © 2016 Arthur Corenzan.
-- 1.x licensed under [The 2-Clause BSD License](BSD.md) © 2014 Kevin Douglas.
+- 2.x licensed under [The MIT License](LICENSE.md) © 2016 Arthur Corenzan.
+- 1.x licensed under [The 2-Clause BSD License](LICENSE.md) © 2014 Kevin Douglas.
 
 This Add-on is not created by, affiliated with or sponsored by ZeniMax Media Inc. or its affiliates. The Elder Scrolls® and related logos are registered trademarks or trademarks of ZeniMax Media Inc. in the United States and/or other countries. All rights reserved. See [Add-on Terms of Use](https://account.elderscrollsonline.com/add-on-terms).
