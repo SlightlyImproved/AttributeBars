@@ -6,10 +6,10 @@
 
 **Slightly Improved™ Attribute Bars** has received a major overhaul in version 2. Besides being now compatible with the latest version of the game, it leverages new built-in features, like displaying resource values over the your attribute bars, and adds new options.
 
-- Subtle visual enhancements to the Magicka, Health, and Stamina bars.
-- Switch target's Health bar position to the bottom of the screen, optionally only during combat.
-- Prevent the Health bar from fading while shield or damage absorption effect are active.
-- Displace Magicka, Health, and Stamina bars either further apart or closer together.
+- Better font used on Magicka, Health, and Stamina bars value labels.
+- Optionally switch target's Health bar position to the bottom of the screen.
+- Prevent the Health bar from fading while shield or damage absorption effects are active.
+- Displace Magicka, Health, and Stamina bars either further apart or closer together with a slider.
 
 ## Acknowledgement
 
