@@ -2,6 +2,10 @@
 
 > Add-on for Elder Scrolls Online to enhance the player's attribute bars.
 
+## Download
+
+You can [download the latest version from ESOUI](https://www.esoui.com/downloads/info1264-SlightlyImprovedDialogues.html).
+
 ## About
 
 **Slightly Improved™ Attribute Bars** has received a major overhaul in version 2. Besides being now compatible with the latest version of the game, it leverages new built-in features, like displaying resource values over the your attribute bars, and adds new options.
@@ -10,6 +14,10 @@
 - Optionally switch target's Health bar position to the bottom of the screen.
 - Prevent the Health bar from fading while shield or damage absorption effects are active.
 - Displace Magicka, Health, and Stamina bars either further apart or closer together with a slider.
+
+## Change log
+
+See [CHANGELOG.bbcode](CHANGELOG.bbcode).
 
 ## Acknowledgement
 
