@@ -7,6 +7,4 @@
 ## DependsOn: LibAddonMenu-2.0
 
 Settings.lua
-
-SlightlyImprovedAttributeBars.xml
 SlightlyImprovedAttributeBars.lua

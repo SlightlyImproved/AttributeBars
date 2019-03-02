@@ -1,6 +1,0 @@
-<!-- Slightly Improved™ Attribute Bars
-  -- The MIT License © 2017 Arthur Corenzan
-  -->
-<GuiXml>
-    <Font name="SiabFont" font="$(BOLD_FONT)|18|soft-shadow-thick"/>
-</GuiXml>
