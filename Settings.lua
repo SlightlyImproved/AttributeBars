@@ -18,18 +18,18 @@ local options =
 {
     {
         type = "dropdown",
-        name = "Switch Target's Frame Position",
-        tooltip = "Switch the target's Health bar position from the top to the bottom of screen. Automatic will only do the switch during combat.",
-        choices = {"Never", "Always", "Automatic"},
-        getFunc = function() return settings.switchTargetFramePosition end,
-        setFunc = function(value) settings.switchTargetFramePosition = value end,
+        name = "Target's Health Bar Position",
+        tooltip = "Controls whether to display the target's Health Bar on the top or the bottom of the screen. Automatic will switch to the bottom only during combat.",
+        choices = {"Top", "Bottom", "Automatic"},
+        getFunc = function() return settings.switchTargetUnitFramePosition end,
+        setFunc = function(value) settings.switchTargetUnitFramePosition = value end,
     },
     {
         type = "checkbox",
-        name = "Prevent Shielded Health From Fading",
-        tooltip = "Prevent the Health bar from fading while shield or damage absorption effect are active.",
-        getFunc = function() return settings.keepShieldedHealthShowing end,
-        setFunc = function(value) settings.keepShieldedHealthShowing = value end,
+        name = "Shielded/Armored Health Visiblity",
+        tooltip = "Prevent the Health Bar from fading while shield or damage absorption effects are active.",
+        getFunc = function() return settings.preventBuffedHealthFromFading end,
+        setFunc = function(value) settings.preventBuffedHealthFromFading = value end,
     },
     {
         type = "slider",
