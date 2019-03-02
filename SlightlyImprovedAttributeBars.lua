@@ -1,29 +1,30 @@
 -- Slightly Improved™ Attribute Bars
 -- The MIT License © 2017 Arthur Corenzan
 
--- Uncomment to disable debug messages
-local function d()  end
-local function df() end
-
 local NAMESPACE = "SlightlyImprovedAttributeBars"
-local savedVars = {}
 
 --
 --
 --
 
--- Override default format
+-- Add the percentage sign to the existing format string for absolute value and percentage.
 SafeAddString(SI_ATTRIBUTE_NUMBERS_WITH_PERCENT, "<<1>> (<<2>>%)")
 
--- Override esoui/ingame/globals/globals.lua:123
+-- ZeniMax pulled a lazy one here and used the same format string
+-- for both the absolute value and percentage only. The thing is
+-- a "%" isn't added and I think it's bad design. So now I have to
+-- override the whole function just to add an extra character at
+-- the end of one string. Sight...
+--
+-- Originally found at EsoUI/Ingame/Globals/Globals.lua:81.
 function ZO_FormatResourceBarCurrentAndMax(current, maximum)
     local returnValue = ""
 
     local percent = 0
     if maximum ~= 0 then
-        percent = (current / maximum) * 100
+        percent = (current/maximum) * 100
         if percent < 10 then
-            percent = ZO_LocalizeDecimalNumber(zo_roundToNearest(percent, .1))
+            percent = ZO_CommaDelimitDecimalNumber(zo_roundToNearest(percent, .1))
         else
             percent = zo_round(percent)
         end
@@ -45,112 +46,75 @@ end
 --
 --
 
-local function ImprovePlayerAttributeBars()
-    -- Bars for Magicka, Health and Stamina
-    for _, i in ipairs({1, 3, 5}) do
-        local attributeBar = PLAYER_ATTRIBUTE_BARS.bars[i]
-        attributeBar.control.resourceNumbersLabel:SetFont("SiabFont")
-        attributeBar:UpdateResourceNumbersLabel(attributeBar.current, attributeBar.effectiveMax)
-    end
-end
-
--- esoui/esoui/blob/master/esoui/ingame/playerattributebars/playerattributebars.lua:375
+-- Originally found at EsoUI/Ingame/PlayerAttributeBars/PlayerAttributeBars.lua:375.
 local ATTRIBUTE_BAR_EXPANDED_WIDTH = 323
+
+-- Minimum space between attribute bars.
 local ATTRIBUTE_BAR_GUTTER = 30
 
-local function GetAttributeBarMinOffsetX()
-    return ATTRIBUTE_BAR_GUTTER
+-- Update attribute bars offsetX based on the shift set in settings.
+local function UpdateAttributeBarsOffsetX(value)
+    -- A smaller offset would overlap the bars.
+    local minOffsetX = ATTRIBUTE_BAR_GUTTER
+
+    -- A larger offset would move the bar outset of the screen.
+    local maxOffsetX = (GuiRoot:GetWidth() - ATTRIBUTE_BAR_EXPANDED_WIDTH) / 2 - ATTRIBUTE_BAR_EXPANDED_WIDTH - ATTRIBUTE_BAR_GUTTER
+
+    -- Convert from -100..+100 range to actual UI unit range.
+    local offsetX = (value + 100) * (maxOffsetX - minOffsetX) / 200 + minOffsetX
+
+    -- Health bar is centered so we don't touch it.
+    -- Magicka bar is to the left. and since the UI plane goes left to
+    -- right we apply a negative version of the new calculated offsetX.
+    ZO_PlayerAttributeMagicka:ClearAnchors()
+    ZO_PlayerAttributeMagicka:SetAnchor(RIGHT, ZO_PlayerAttributeHealth, LEFT, -offsetX, 0)
+
+    -- Stamina bar is to the right so we can just set the new offsetX.
+    ZO_PlayerAttributeStamina:ClearAnchors()
+    ZO_PlayerAttributeStamina:SetAnchor(LEFT, ZO_PlayerAttributeHealth, RIGHT, offsetX, 0)
 end
 
-local function GetAttributeBarMaxOffsetX()
-    return GuiRoot:GetWidth() / 2 - ATTRIBUTE_BAR_EXPANDED_WIDTH / 2 - ATTRIBUTE_BAR_EXPANDED_WIDTH - ATTRIBUTE_BAR_GUTTER
-end
+--
+--
+--
 
-local function ApplyAttributeBarsOffsetXShift(value)
-    local anchor = ZO_Anchor:New()
-
-    -- Convert from -100..+100 range to actual UI pixel range.
-    local offsetX = (value + 100) * (GetAttributeBarMaxOffsetX() - GetAttributeBarMinOffsetX()) / 200 + GetAttributeBarMinOffsetX()
-
-    anchor:SetFromControlAnchor(ZO_PlayerAttributeMagicka, 0)
-    anchor:SetOffsets(-offsetX)
-    anchor:SetRelativePoint(LEFT)
-    anchor:SetMyPoint(RIGHT)
-    anchor:SetTarget(ZO_PlayerAttributeHealth)
-    anchor:Set(ZO_PlayerAttributeMagicka)
-
-    anchor:SetFromControlAnchor(ZO_PlayerAttributeStamina, 0)
-    anchor:SetOffsets(offsetX)
-    anchor:SetRelativePoint(RIGHT)
-    anchor:SetMyPoint(LEFT)
-    anchor:SetTarget(ZO_PlayerAttributeHealth)
-    anchor:Set(ZO_PlayerAttributeStamina)
-end
-
-local TARGET_UNIT_FRAME_OFFSET_OPTIONS =
+local targetUnitFrameOffsetY =
 {
     ["Top"] = 88,
-    ["Bottom"] = 742,
+    ["Bottom"] = -288,
 }
 
-local PLAYER_TO_PLAYER_OFFSET_OPTIONS =
+local targetUnitFramePoint =
+{
+    ["Top"] = TOP,
+    ["Bottom"] = BOTTOM,
+}
+
+local playerToPlayerOffsetY =
 {
     ["Top"] = -285,
-    ["Bottom"] = -385,
+    ["Bottom"] = -395,
 }
 
-local function ImproveTargetUnitFrame()
-    local unitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
-    unitFrame.healthBar.resourceNumbersLabel:SetFont("SiabFont")
-end
-
-local function SwitchTargetFramePosition(position)
-    local unitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
-    local anchor = ZO_Anchor:New()
-
-    anchor:SetFromControlAnchor(unitFrame.frame, 0)
-    anchor:SetOffsets(nil, TARGET_UNIT_FRAME_OFFSET_OPTIONS[position])
-    anchor:Set(unitFrame.frame)
-
-    anchor:SetFromControlAnchor(PLAYER_TO_PLAYER.container, 0)
-    anchor:SetOffsets(nil, PLAYER_TO_PLAYER_OFFSET_OPTIONS[position])
-    anchor:Set(PLAYER_TO_PLAYER.container)
-end
-
-local function PreventShieldedHealthBarFade()
-    local healthBar = PLAYER_ATTRIBUTE_BARS.bars[1]
-
-    local onPowerShieldUnitAttributeVisualAdded = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualAdded
-    function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualAdded(...)
-        onPowerShieldUnitAttributeVisualAdded(self, ...)
-        if (savedVars.keepShieldedHealthShowing) then
-            healthBar:AddForcedVisibleReference()
+-- Here we use table maps to know which offsetY or anchor point to use in each
+-- available position. Also we have to move the player-to-player prompt up bit
+-- so it doesn't overlap with the target's unit frame new position.
+--
+local function UpdateTargetUnitFramePosition(option, inCombat)
+    if (option == "Automatic") then
+        if (inCombat) then
+            option = "Bottom"
+        else
+            option = "Top"
         end
     end
 
-    local onPowerShieldUnitAttributeVisualRemoved = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualRemoved
-    function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualRemoved(...)
-        onPowerShieldUnitAttributeVisualRemoved(self, ...)
-        if (savedVars.keepShieldedHealthShowing) then
-            healthBar:RemoveForcedVisibleReference()
-        end
-    end
+    local targetUnitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
+    targetUnitFrame.frame:ClearAnchors()
+    targetUnitFrame.frame:SetAnchor(targetUnitFramePoint[option], GuiRoot, nil, 0, targetUnitFrameOffsetY[option])
 
-    local onArmorDamageUnitAttributeVisualAdded = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualAdded
-    function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualAdded(...)
-        onArmorDamageUnitAttributeVisualAdded(self, ...)
-        if (savedVars.keepShieldedHealthShowing) then
-            healthBar:AddForcedVisibleReference()
-        end
-    end
-
-    local onArmorDamageUnitAttributeVisualRemoved = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualRemoved
-    function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualRemoved(...)
-        onArmorDamageUnitAttributeVisualRemoved(self, ...)
-        if (savedVars.keepShieldedHealthShowing) then
-            healthBar:RemoveForcedVisibleReference()
-        end
-    end
+    PLAYER_TO_PLAYER.container:ClearAnchors()
+    PLAYER_TO_PLAYER.container:SetAnchor(BOTTOM, PLAYER_TO_PLAYER.control, nil, 0, playerToPlayerOffsetY[option])
 end
 
 --
@@ -159,53 +123,117 @@ end
 
 local defaultSavedVars =
 {
-    switchTargetFramePosition = "Never",
-    keepShieldedHealthShowing = true,
+    switchTargetUnitFramePosition = "Top",
+    preventBuffedHealthFromFading = true,
     attributeBarsOffsetXShift = 0,
 }
 
-local function OnAddOnLoaded(event, addOnName)
-    if (addOnName == NAMESPACE) then
-        savedVars = ZO_SavedVars:New(NAMESPACE.."_SavedVars", 1, nil, defaultSavedVars)
+CALLBACK_MANAGER:RegisterCallback(NAMESPACE.."_OnSavedVarChanged", function(key, newValue, previousValue)
+    if (key == "switchTargetUnitFramePosition") then
+        UpdateTargetUnitFramePosition(newValue)
+    elseif (key == "attributeBarsOffsetXShift") then
+        UpdateAttributeBarsOffsetX(newValue)
+    end
+end)
 
+CALLBACK_MANAGER:RegisterCallback(NAMESPACE.."_OnAddOnLoaded", function(savedVars)
+    local function OnPlayerActivated()
+
+        -- Change font of the bar labels and refresh their values.
+        for _, i in ipairs({1, 3, 5}) do
+            local attributeBar = PLAYER_ATTRIBUTE_BARS.bars[i]
+            attributeBar.control.resourceNumbersLabel:SetFont("ZoFontWinH4")
+            attributeBar:UpdateResourceNumbersLabel(attributeBar.current, attributeBar.effectiveMax)
+        end
+
+        -- Change font of the target's health bar as well.
+        local unitFrame = ZO_UnitFrames_GetUnitFrame("reticleover")
+        unitFrame.healthBar.resourceNumbersLabel:SetFont("ZoFontWinH4")
+
+        UpdateTargetUnitFramePosition(savedVars.switchTargetUnitFramePosition)
+        UpdateAttributeBarsOffsetX(savedVars.attributeBarsOffsetXShift)
+
+        -- Here we prevent the health bar from fading when a buff is applied to our health
+        -- such as armor or shield. Extended health due to food comsuption doesn't count.
+        -- We seize the fact that attribute bars already have a mechanism
+        -- in-place to prevent them from fading in other circunstances.
         do
-            local mt = getmetatable(savedVars)
-            local __newindex = mt.__newindex
-            function mt.__newindex(self, key, value)
+            local healthBar = PLAYER_ATTRIBUTE_BARS.bars[1]
+
+            -- Originally found at EsoUI/Ingame/UnitAttributeVisualizer/Modules/PowerShield.lua:117.
+            local onPowerShieldUnitAttributeVisualAdded = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualAdded
+            function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualAdded(...)
+                onPowerShieldUnitAttributeVisualAdded(self, ...)
+                if (savedVars.preventBuffedHealthFromFading) then
+                    healthBar:AddForcedVisibleReference()
+                end
+            end
+
+            -- Originally found at EsoUI/Ingame/UnitAttributeVisualizer/Modules/PowerShield.lua:133.
+            local onPowerShieldUnitAttributeVisualRemoved = ZO_UnitVisualizer_PowerShieldModule.OnUnitAttributeVisualRemoved
+            function ZO_UnitVisualizer_PowerShieldModule:OnUnitAttributeVisualRemoved(...)
+                onPowerShieldUnitAttributeVisualRemoved(self, ...)
+                if (savedVars.preventBuffedHealthFromFading) then
+                    healthBar:RemoveForcedVisibleReference()
+                end
+            end
+
+            -- Originally found at EsoUI/Ingame/UnitAttributeVisualizer/Modules/ArmorDamage.lua:250.
+            local onArmorDamageUnitAttributeVisualAdded = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualAdded
+            function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualAdded(...)
+                onArmorDamageUnitAttributeVisualAdded(self, ...)
+                if (savedVars.preventBuffedHealthFromFading) then
+                    healthBar:AddForcedVisibleReference()
+                end
+            end
+
+            -- Originally found at EsoUI/Ingame/UnitAttributeVisualizer/Modules/ArmorDamage.lua:260.
+            local onArmorDamageUnitAttributeVisualRemoved = ZO_UnitVisualizer_ArmorDamage.OnUnitAttributeVisualRemoved
+            function ZO_UnitVisualizer_ArmorDamage:OnUnitAttributeVisualRemoved(...)
+                onArmorDamageUnitAttributeVisualRemoved(self, ...)
+                if (savedVars.preventBuffedHealthFromFading) then
+                    healthBar:RemoveForcedVisibleReference()
+                end
+            end
+        end
+    end
+    EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
+
+    local function OnPlayerCombatState(eventCode, inCombat)
+        UpdateTargetUnitFramePosition(savedVars.switchTargetUnitFramePosition, inCombat)
+    end
+    EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_COMBAT_STATE, OnPlayerCombatState)
+end)
+
+--
+--
+--
+
+-- Add-on entrypoint. You should NOT need to edit below this line.
+-- Make sure you have set a NAMESPACE variable and you're good to go.
+--
+-- If you need to hook into the AddOnLoaded event use the NAMESPACE.."_OnAddOnLoaded" callback. e.g.
+-- CALLBACK_MANAGER:RegisterCallback(NAMESPACE.."_OnAddOnLoaded", function(savedVars)
+--     ...
+-- end)
+--
+-- To listen to saved variables being changed use the NAMESPACE.."_OnSavedVarChanged" callback. e.g.
+-- CALLBACK_MANAGER:RegisterCallback(NAMESPACE.."_OnSavedVarChanged", function(key, newValue, previousValue)
+--     ...
+-- end)
+--
+EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_ADD_ON_LOADED, function(eventCode, addOnName)
+    if (addOnName == NAMESPACE) then
+        local savedVars = ZO_SavedVars:New(NAMESPACE.."_SavedVars", 2, nil, defaultSavedVars)
+        do
+            local t = getmetatable(savedVars)
+            local __newindex = t.__newindex
+            function t.__newindex(self, key, value)
+                CALLBACK_MANAGER:FireCallbacks(NAMESPACE.."_OnSavedVarChanged", key, value, self[key])
                 __newindex(self, key, value)
-                if (key == "targetFramePosition") then
-                    if (value == "Always") or (value == "Automatic" and IsUnitInCombat("player")) then
-                        SwitchTargetFramePosition("Bottom")
-                    else
-                        SwitchTargetFramePosition("Top")
-                    end
-                end
-                if (key == "attributeBarsOffsetXShift") then
-                    ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
-                end
             end
         end
-
-        local function OnPlayerActivated()
-            ImprovePlayerAttributeBars()
-            ImproveTargetUnitFrame()
-            if (savedVars.switchTargetFramePosition == "Always") then
-                SwitchTargetFramePosition("Bottom")
-            end
-            ApplyAttributeBarsOffsetXShift(savedVars.attributeBarsOffsetXShift)
-            PreventShieldedHealthBarFade()
-        end
-        EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_ACTIVATED, OnPlayerActivated)
-
-        local function OnPlayerCombatState(eventCode, inCombat)
-            if (savedVars.switchTargetFramePosition == "Automatic") then
-                SwitchTargetFramePosition(inCombat and "Bottom" or "Top")
-            end
-        end
-        EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_PLAYER_COMBAT_STATE, OnPlayerCombatState)
-
         CALLBACK_MANAGER:FireCallbacks(NAMESPACE.."_OnAddOnLoaded", savedVars)
     end
-end
+end)
 
-EVENT_MANAGER:RegisterForEvent(NAMESPACE, EVENT_ADD_ON_LOADED, OnAddOnLoaded)
