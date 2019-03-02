@@ -1,6 +1,6 @@
 ## APIVersion: 100026
-## Version: 2.2.1
-## AddOnVersion: 221
+## Version: 2.2.2
+## AddOnVersion: 222
 ## Title: Slightly Improved™ Attribute Bars
 ## License: MIT
 ## SavedVariables: SlightlyImprovedAttributeBars_SavedVars
